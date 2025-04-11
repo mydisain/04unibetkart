@@ -739,7 +739,7 @@ const BookingPage = () => {
           </Typography>
           
           <Grid container spacing={2}>
-            {selectedTimeslots.map((timeslotStartTime) => {
+            {Array.isArray(selectedTimeslots) && selectedTimeslots.map((timeslotStartTime) => {
               const timeslot = availableTimeslots.find(t => t.startTime === timeslotStartTime);
               if (!timeslot) return null;
               
@@ -767,7 +767,7 @@ const BookingPage = () => {
           </Typography>
           
           <List>
-            {selectedKarts.map(kartId => {
+            {Array.isArray(selectedKarts) && selectedKarts.map(kartId => {
               const kart = karts.find(k => k._id === kartId);
               if (!kart) return null;
               

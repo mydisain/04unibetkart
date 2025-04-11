@@ -1,14 +1,52 @@
-const express = require('express');
+// Move dotenv config to the very top, before other requires
+const path = require('path');
 const dotenv = require('dotenv');
+
+// Configure dotenv with absolute path
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Debug environment variables
+console.log('Environment Check:', {
+  MONGO_URI: process.env.MONGO_URI,
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT
+});
+
+const express = require('express');
 const colors = require('colors');
 const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
+const fs = require('fs');
 const { connectDB } = require('./config/db');
+
+// Set strictQuery to false to prepare for Mongoose 7
+mongoose.set('strictQuery', false);
 const { errorHandler } = require('./middleware/errorMiddleware');
 
-// Load environment variables
-dotenv.config();
+// Load environment variables before any other imports
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Add this line after dotenv.config() to debug
+console.log('Environment variables loaded:', {
+  MONGO_URI: process.env.MONGO_URI,
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT
+});
+
+// Try to read JWT_SECRET from the secret file if it exists
+try {
+  if (fs.existsSync('/etc/secrets/JWT_SECRET')) {
+    const jwtSecret = fs.readFileSync('/etc/secrets/JWT_SECRET', 'utf8').trim();
+    process.env.JWT_SECRET = jwtSecret;
+    console.log('JWT_SECRET loaded from secret file');
+  } else {
+    console.log('JWT_SECRET secret file not found, using environment variable');
+  }
+} catch (error) {
+  console.error('Error reading JWT_SECRET from secret file:', error.message);
+}
 
 // Connect to database
 connectDB();
@@ -18,7 +56,26 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+
+// Configure CORS to allow requests from your Zone.ee domain and local file system
+app.use(cors({
+  origin: '*', // Allow all origins temporarily to debug the issue
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Add CORS preflight handling for all routes
+app.options('*', cors());
+
+// Add specific CORS headers to all responses
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 // Development logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -49,7 +106,8 @@ if (process.env.NODE_ENV === 'production') {
 // Error handling middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Use the port provided by Render or default to 5004 for local development
+const PORT = process.env.PORT || 5004;
 
 app.listen(PORT, () => {
   console.log(

@@ -1,5 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// Add this near the top of your file
+import axios from 'axios';
+
+// Set the base URL for all axios requests
+// Make sure this points to your actual backend API URL
+axios.defaults.baseURL = 'https://zero4unibetkart.onrender.com'; // or your production API URL
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';

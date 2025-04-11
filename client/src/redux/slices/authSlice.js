@@ -39,48 +39,26 @@ export const login = createAsyncThunk(
           'Content-Type': 'application/json',
         },
       };
-
+      
+      // Make sure this URL is correct and includes the full path to your API
       const { data } = await axios.post(
-        '/api/users/login',
+        '/api/users/login', // Change this to the full URL if needed
         { email, password },
         config
       );
-
-      // Validate the response data before storing
-      if (!data || !data.token) {
-        console.error('Invalid login response, missing token:', data);
-        return rejectWithValue('Invalid login response from server');
-      }
-
-      // Ensure token is properly formatted before storing
-      if (data.token) {
-        data.token = data.token.trim();
-      }
       
-      // Store user info in localStorage
+      // Store user in localStorage
       localStorage.setItem('userInfo', JSON.stringify(data));
       
-      // Force a reload of the page to ensure a fresh state
-      console.log('User logged in successfully:', {
-        id: data._id,
-        name: data.name,
-        isAdmin: data.isAdmin,
-        tokenExists: !!data.token,
-        tokenLength: data.token.length
-      });
-      
-      // Log the token for debugging
-      if (data.token) {
-        console.log('Token first 10 chars:', data.token.substring(0, 10) + '...');
-      }
-
       return data;
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
+      // Log the actual response for debugging
+      console.error('Login error response:', error.response?.data || error.message);
+      
       return rejectWithValue(
         error.response && error.response.data.message
           ? error.response.data.message
-          : error.message
+          : error.message || 'Login failed'
       );
     }
   }

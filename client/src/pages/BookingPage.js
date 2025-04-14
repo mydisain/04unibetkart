@@ -295,7 +295,7 @@ const BookingPage = () => {
     
     // Create kartSelections array with proper format
     const kartSelections = selectedKarts.map(kartId => {
-      const kart = karts.find(k => k._id === kartId);
+      const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
       return {
         kart: kartId,
         quantity: kartQuantities[kartId] || 1, // Use the selected quantity or default to 1
@@ -528,7 +528,7 @@ const BookingPage = () => {
               </DialogContentText>
               
               <Grid container spacing={3} sx={{ mt: 2 }}>
-                {karts && karts.map((kart) => {
+                {Array.isArray(karts) && karts.length > 0 && karts.map((kart) => {
                   // Get availability for this kart in the current timeslot
                   const kartAvailability = timeslotObj?.kartAvailability?.find(k => k._id === kart._id);
                   const availableQuantity = kartAvailability?.available || 0;
@@ -661,7 +661,7 @@ const BookingPage = () => {
                   </Typography>
                   <List>
                     {selectedKarts.map(kartId => {
-                      const kart = karts.find(k => k._id === kartId);
+                      const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
                       if (!kart) return null;
                       
                       return (
@@ -700,7 +700,7 @@ const BookingPage = () => {
     // Calculate total price
     const totalPrice = selectedTimeslots.reduce((total, timeslotStartTime) => {
       return total + selectedKarts.reduce((kartTotal, kartId) => {
-        const kart = karts.find(k => k._id === kartId);
+        const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
         if (!kart) return kartTotal;
         return kartTotal + (kart.pricePerSlot * (kartQuantities[kartId] || 1));
       }, 0);
@@ -768,7 +768,7 @@ const BookingPage = () => {
           
           <List>
             {selectedKarts.map(kartId => {
-              const kart = karts.find(k => k._id === kartId);
+              const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
               if (!kart) return null;
               
               return (

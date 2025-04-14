@@ -172,7 +172,7 @@ const DashboardPage = () => {
       // Ensure duration is a number in minutes
       duration: parseInt(currentTimeslot.durationMinutes || 30, 10),
       kartSelections: selectedKarts.map(kartId => {
-        const kart = karts.find(k => k._id === kartId);
+        const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
         return {
           kart: kartId,
           quantity: kartQuantities[kartId] || 1,
@@ -181,7 +181,7 @@ const DashboardPage = () => {
       }),
       // Calculate totalPrice to avoid NaN on the server
       totalPrice: selectedKarts.reduce((total, kartId) => {
-        const kart = karts.find(k => k._id === kartId);
+        const kart = Array.isArray(karts) ? karts.find(k => k._id === kartId) : null;
         const quantity = kartQuantities[kartId] || 1;
         const price = kart && kart.pricePerSlot ? parseFloat(kart.pricePerSlot) : 0;
         return total + (price * quantity);
@@ -388,7 +388,7 @@ const DashboardPage = () => {
               </Typography>
               
               <Grid container spacing={3} sx={{ mt: 2 }}>
-                {karts && karts.map((kart) => {
+                {Array.isArray(karts) && karts.length > 0 && karts.map((kart) => {
                   // Get availability for this kart in the current timeslot
                   const timeslotObj = currentTimeslot && Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === currentTimeslot) : null;
                   const kartAvailability = timeslotObj?.kartAvailability?.find(k => k._id === kart._id);

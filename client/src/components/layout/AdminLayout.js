@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
@@ -38,6 +38,7 @@ const AdminLayout = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { settings } = useSelector((state) => state.settings);
   
   useEffect(() => {
@@ -62,6 +63,25 @@ const AdminLayout = () => {
   const handleLogout = () => {
     dispatch(logout());
     navigate('/admin/login');
+  };
+  
+  // Function to get the page title based on the current route
+  const getPageTitle = (pathname) => {
+    if (pathname === '/admin' || pathname === '/admin/') {
+      return t('dashboard');
+    } else if (pathname.includes('/admin/karts')) {
+      return t('karts');
+    } else if (pathname.includes('/admin/bookings')) {
+      return t('bookings');
+    } else if (pathname.includes('/admin/settings')) {
+      return t('settings');
+    } else if (pathname.includes('/admin/users')) {
+      return t('users');
+    } else if (pathname.includes('/admin/profile')) {
+      return t('profile');
+    } else {
+      return t('admin_panel');
+    }
   };
   
   const menuItems = [
@@ -139,7 +159,7 @@ const AdminLayout = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {settings?.businessName ? `${settings.businessName} - ${t('admin')}` : t('karts')}
+            {settings?.businessName ? `${settings.businessName} - ${t('admin')}` : getPageTitle(location.pathname)}
           </Typography>
           <IconButton
             size="large"

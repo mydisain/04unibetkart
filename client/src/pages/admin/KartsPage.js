@@ -341,7 +341,7 @@ const KartsPage = () => {
             </Alert>
           ) : (
             <Grid container spacing={3}>
-              {karts && karts.map((kart) => (
+              {Array.isArray(karts) && karts.length > 0 && karts.map((kart) => (
                 <Grid item xs={12} sm={6} md={4} key={kart._id}>
                   <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

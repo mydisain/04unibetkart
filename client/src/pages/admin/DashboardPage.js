@@ -78,7 +78,7 @@ const DashboardPage = () => {
   // Handle timeslot selection
   const handleTimeslotSelect = (timeslot) => {
     // Find the selected timeslot object
-    const foundTimeslot = availableTimeslots.find(t => t.startTime === timeslot);
+    const foundTimeslot = Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === timeslot) : null;
     
     if (!foundTimeslot) {
       console.error('Timeslot not found:', timeslot);
@@ -277,7 +277,7 @@ const DashboardPage = () => {
             </Alert>
           ) : (
             <Grid container spacing={2} sx={{ mt: 2 }}>
-              {availableTimeslots && availableTimeslots.length > 0 ? (
+              {Array.isArray(availableTimeslots) && availableTimeslots.length > 0 ? (
                 availableTimeslots.map((timeslot) => (
                   <Grid item xs={6} sm={4} md={3} key={timeslot.startTime}>
                     <Button
@@ -390,7 +390,7 @@ const DashboardPage = () => {
               <Grid container spacing={3} sx={{ mt: 2 }}>
                 {karts && karts.map((kart) => {
                   // Get availability for this kart in the current timeslot
-                  const timeslotObj = currentTimeslot ? availableTimeslots.find(t => t.startTime === currentTimeslot) : null;
+                  const timeslotObj = currentTimeslot && Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === currentTimeslot) : null;
                   const kartAvailability = timeslotObj?.kartAvailability?.find(k => k._id === kart._id);
                   const availableQuantity = kartAvailability?.available || 0;
                   const maxAvailable = Math.min(availableQuantity, kart.quantity || 1);

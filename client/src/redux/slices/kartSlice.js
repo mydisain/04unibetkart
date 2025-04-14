@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
 
 // Get all karts
 export const getKarts = createAsyncThunk(
   'karts/getKarts',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get('/api/karts');
+      const { data } = await axiosInstance.get('/api/karts');
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -33,7 +33,7 @@ export const getKartsAdmin = createAsyncThunk(
         },
       };
 
-      const { data } = await axios.get('/api/karts/admin/all', config);
+      const { data } = await axiosInstance.get('/api/karts/admin/all', config);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -50,9 +50,9 @@ export const createKart = createAsyncThunk(
   'karts/createKart',
   async (kartData, { getState, rejectWithValue }) => {
     try {
-      const {
-        auth: { userInfo },
-      } = getState();
+      // Use let instead of const to allow reassignment
+      let userInfoFromState = getState().auth.userInfo;
+      let userInfo = { ...userInfoFromState };
 
       // Check if user is authenticated and is an admin
       if (!userInfo || !userInfo.token) {
@@ -94,7 +94,7 @@ export const createKart = createAsyncThunk(
         },
       };
 
-      const { data } = await axios.post('/api/karts', kartData, config);
+      const { data } = await axiosInstance.post('/api/karts', kartData, config);
       return data;
     } catch (error) {
       console.error('Create kart error:', error.response?.data || error.message);
@@ -112,9 +112,9 @@ export const updateKart = createAsyncThunk(
   'karts/updateKart',
   async ({ id, kartData }, { getState, rejectWithValue }) => {
     try {
-      const {
-        auth: { userInfo },
-      } = getState();
+      // Use let instead of const to allow reassignment
+      let userInfoFromState = getState().auth.userInfo;
+      let userInfo = { ...userInfoFromState };
 
       if (!userInfo || !userInfo.token) {
         console.error('Authentication error: No user token found');
@@ -152,7 +152,7 @@ export const updateKart = createAsyncThunk(
 
       console.log(`Making PUT request to /api/karts/${id}`, { kartData, authHeader: config.headers.Authorization.substring(0, 20) + '...' });
       
-      const { data } = await axios.put(`/api/karts/${id}`, kartData, config);
+      const { data } = await axiosInstance.put(`/api/karts/${id}`, kartData, config);
       console.log('Kart updated successfully:', data);
       return data;
     } catch (error) {
@@ -171,9 +171,9 @@ export const deleteKart = createAsyncThunk(
   'karts/deleteKart',
   async (id, { getState, rejectWithValue }) => {
     try {
-      const {
-        auth: { userInfo },
-      } = getState();
+      // Use let instead of const to allow reassignment
+      let userInfoFromState = getState().auth.userInfo;
+      let userInfo = { ...userInfoFromState };
 
       const config = {
         headers: {
@@ -181,7 +181,7 @@ export const deleteKart = createAsyncThunk(
         },
       };
 
-      await axios.delete(`/api/karts/${id}`, config);
+      await axiosInstance.delete(`/api/karts/${id}`, config);
       return id;
     } catch (error) {
       return rejectWithValue(

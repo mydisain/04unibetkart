@@ -176,7 +176,7 @@ const BookingsPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bookings
+                {Array.isArray(bookings) ? bookings
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((booking) => (
                     <TableRow hover key={booking._id}>
@@ -225,14 +225,14 @@ const BookingsPage = () => {
                         </IconButton>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : null}
               </TableBody>
             </Table>
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={bookings.length}
+            count={Array.isArray(bookings) ? bookings.length : 0}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

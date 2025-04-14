@@ -145,7 +145,7 @@ const BookingPage = () => {
     if (!timeslots || timeslots.length === 0) return 0;
     
     return timeslots.reduce((total, timeslotStartTime) => {
-      const timeslot = availableTimeslots.find(t => t.startTime === timeslotStartTime);
+      const timeslot = Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === timeslotStartTime) : null;
       if (!timeslot) return total;
       
       // Calculate duration in minutes
@@ -288,8 +288,8 @@ const BookingPage = () => {
     
     // Get the first and last timeslot to determine booking start and end time
     const sortedTimeslots = [...selectedTimeslots].sort();
-    const firstTimeslotObj = availableTimeslots.find(t => t.startTime === sortedTimeslots[0]);
-    const lastTimeslotObj = availableTimeslots.find(t => t.startTime === sortedTimeslots[sortedTimeslots.length - 1]);
+    const firstTimeslotObj = Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === sortedTimeslots[0]) : null;
+    const lastTimeslotObj = Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === sortedTimeslots[sortedTimeslots.length - 1]) : null;
     
     if (!firstTimeslotObj || !lastTimeslotObj) return;
     
@@ -378,7 +378,7 @@ const BookingPage = () => {
             <Paper sx={{ p: 2 }}>
               <Grid container spacing={2}>
                 {selectedTimeslots.map((timeslotStartTime) => {
-                  const timeslot = availableTimeslots.find(t => t.startTime === timeslotStartTime);
+                  const timeslot = Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === timeslotStartTime) : null;
                   if (!timeslot) return null;
                   
                   return (
@@ -422,7 +422,7 @@ const BookingPage = () => {
           </Alert>
         ) : (
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            {availableTimeslots && availableTimeslots.length > 0 ? (
+            {Array.isArray(availableTimeslots) && availableTimeslots.length > 0 ? (
               availableTimeslots.map((timeslot) => {
                 const isSelected = selectedTimeslots.includes(timeslot.startTime);
                 const isPast = isTimeslotInPast(timeslot.startTime);
@@ -498,7 +498,7 @@ const BookingPage = () => {
   // Kart selection dialog component as a memoized component
   const KartSelectionDialog = React.memo(() => {
     // Get the current timeslot object
-    const timeslotObj = currentTimeslot ? availableTimeslots.find(t => t.startTime === currentTimeslot) : null;
+    const timeslotObj = currentTimeslot && Array.isArray(availableTimeslots) ? availableTimeslots.find(t => t.startTime === currentTimeslot) : null;
     
     return (
       <Dialog
